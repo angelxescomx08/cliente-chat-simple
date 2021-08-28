@@ -1,0 +1,20 @@
+.header{
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #252A34;
+}
+
+.nav-ul{
+    list-style: none;
+}
+
+.nav-li{
+    display: inline;
+    margin: 1em;
+}
+
+.link{
+    color: #EAEAEA;
+    text-decoration: none;
+}

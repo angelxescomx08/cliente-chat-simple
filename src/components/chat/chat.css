@@ -1,0 +1,33 @@
+.container-chat {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 4em;
+}
+
+.container-mensajes{
+    overflow: scroll;
+    height: 50vh;
+    width: 50vw;
+}
+
+.mensaje{
+    display: block;
+    margin: 1em;
+    padding: 1em;
+    background-color: #08D9D6;
+    border-radius: 3em;
+}
+
+.container-input{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-mensaje{
+    width: 50%;
+    margin: 1em;
+    border-radius: 5em;
+}
