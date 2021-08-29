@@ -10,7 +10,7 @@ function App() {
     <Router>
       <Nav />
       <Switch>
-        <Route exact path="/">
+        <Route exact path="/cliente-chat-simple">
           <Login />
         </Route>
         <Route exact path="/chat" component={Chat} />
