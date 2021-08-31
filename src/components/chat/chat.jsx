@@ -21,6 +21,7 @@ const Chat = ({ location }) => {
     const [msg, setMsg] = useState()
     const [mensajes, setMensajes] = useState([])
     const [conectados, setConectados] = useState([])
+    const [ultimoMensaje,setUltimoMensaje] = useState('')
     useEffect(() => {
         socket = io(ENDPOINT)
         const { usuario } = queryString.parse(location.search)
@@ -29,23 +30,25 @@ const Chat = ({ location }) => {
         socket.on('conectados', (usuarios) => {
             const arrDestinos = usuarios.filter(item => item !== usuario)
             setConectados(arrDestinos)
-            if(arrDestinos.length>0){setDestino(arrDestinos[0])}
+            if (arrDestinos.length > 0) { setDestino(arrDestinos[0]) }
         })
-        socket.on('recibir', ({ usuario, msg }) => {
+        socket.on('recibir', ({ sender, msg }) => {
             setMensajes(oldArray => [...oldArray, {
-                "user": usuario,
+                "sender": sender,
+                "receiver": usuario,
                 "text": msg
             }])
+            setUltimoMensaje(`Nuevo mensaje de ${sender}`)
         })
         return () => {
             socket.off()
         }
-    }, [ENDPOINT, location])
+    }, [location])
     return (
         <div className="container-chat">
             <h2 className="tittle">Chat {usuario}</h2>
             <div>
-                <span className="">Usuarios conectados: </span>
+                <span className="notificacion">Usuarios conectados:</span>
                 {
                     conectados.length > 0 ?
                         <select name="select" value={destino} onChange={event => {
@@ -54,26 +57,23 @@ const Chat = ({ location }) => {
                         }>
                             {
                                 conectados.map((user) => {
-                                    return (
-                                        <option key={user} value={user}>{user}</option>
-                                    )
+                                    return <option key={user} value={user}>{user}</option>
                                 })
                             }
                         </select>
                         : null
                 }
+                <br/><span className="notificacion">{ultimoMensaje!==''?`${ultimoMensaje}`:null}</span>
                 <div className="container-mensajes">
                     {
-                        mensajes.map(({ user, text }, index) => {
-                            if (text.length > 0) {
-                                if (user !== undefined) {
-                                    return <span className="mensaje" key={`${index}`}>{user}: {text}</span>
-                                } else {
-                                    return <span className="mensaje" key={`${index}`}>Tú: {text}</span>
-                                }
-                            } else {
+                        mensajes.map(({ sender, receiver, text }, index) => {
+                            if (destino === sender || destino === receiver) {
+                                return <span className="mensaje" key={`${index}${sender}`}>
+                                    {sender === usuario ? `Tú: ${text}` : `${sender}: ${text}`}</span>
+                            }else{
                                 return null
                             }
+
                         })
                     }
                 </div>
@@ -83,7 +83,8 @@ const Chat = ({ location }) => {
                     }} onKeyDown={(event) => {
                         if (event.key === 'Enter') {
                             setMensajes(oldArray => [...oldArray, {
-                                "usuario": usuario,
+                                "sender": usuario,
+                                "receiver": destino,
                                 "text": msg
                             }])
                             enviarMensage(socket, usuario, destino, msg)
@@ -91,7 +92,8 @@ const Chat = ({ location }) => {
                     }} />
                     <button className="button" onClick={() => {
                         setMensajes(oldArray => [...oldArray, {
-                            "usuario": usuario,
+                            "sender": usuario,
+                            "receiver": destino,
                             "text": msg
                         }])
                         enviarMensage(socket, usuario, destino, msg)
